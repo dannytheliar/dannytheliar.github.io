@@ -1,0 +1,72 @@
+<!doctype html>
+<head>
+  <title>grundy mode</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Rubik+Glitch&display=swap');
+    body {
+      display: flex;
+      flex-direction: column;
+      width: 60vw;
+      min-width: 30em;
+      margin: auto;
+      gap: 1em;
+      padding: 1em;
+      font-size: 24px;
+      font-family: 'Rubik Glitch', sans-serif;
+    }
+    #text {
+      font-size: 24px;
+    }
+    #output {
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>break the clankers</h1>
+  <label>
+    voice:
+    <input id="voice-name" value="grundy" />
+  </label>
+  <label>
+    text to corrupt (separate each segment by a new line)
+  </label>
+  <textarea id="text" rows="6"></textarea>
+  <p id="output">
+  </p>
+  <button id="copy">copy to clipboard 📋</button>
+  <script>
+    const voiceNameElem = document.getElementById('voice-name');
+    const textElem = document.getElementById('text');
+    const outputElem = document.getElementById('output');
+    const copyBtn = document.getElementById('copy');
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(outputElem.textContent);
+    });
+
+    function generateCorruptingChars(length = 5, rangeStart = 0x2200, rangeSize = 0xFF) {
+      return Array.from(Array(length))
+        .map(_ => String.fromCharCode(rangeStart + Math.floor(Math.random() * rangeSize)))
+        .join(' ');
+    }
+
+    function corruptText(text) {
+      return text.trim()
+        .split('\n')
+        .toSpliced(0, 0, ' ')
+        .map(word => `${word.trim()} ${generateCorruptingChars(5)}`)
+        .join(' ')
+        .trim();
+    }
+
+    function updateOutput() {
+      outputElem.textContent = `${voiceNameElem.value}: ${corruptText(textElem.value)}`;
+    }
+
+    textElem.addEventListener('input', () => updateOutput());
+    voiceNameElem.addEventListener('input', () => updateOutput());
+
+    updateOutput();
+  </script>
+</body>
